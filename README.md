@@ -4,7 +4,7 @@ A macOS AppleScript reminder to quit Docker Desktop at the end of the workday.
 
 At **17:30 Monday–Friday**, a Yes/No dialog asks whether you have finished with Docker. **Yes** asks Docker Desktop to shut down using its own quit operation. **No**, or Escape, leaves it running. No is the default.
 
-![Docker Shutdown Reminder popup](docs/reminder.png)
+<img src="docs/reminder.png" alt="Docker Shutdown Reminder popup" width="420" height="180">
 
 ## Schedule and sleep
 
