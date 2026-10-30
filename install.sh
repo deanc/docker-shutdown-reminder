@@ -15,7 +15,7 @@ case $# in
         fi
         build_only=true
         /bin/mkdir -p "$2"
-        output_dir=$(CDPATH= cd -- "$2" && pwd)
+        output_dir=$(CDPATH='' cd -- "$2" && pwd)
         ;;
     *)
         echo 'Usage: sh install.sh [--build-only OUTPUT_DIRECTORY]' >&2
@@ -28,7 +28,7 @@ if [ "$build_only" = false ] && [ ! -x /Applications/Docker.app/Contents/Resourc
     exit 1
 fi
 
-source_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+source_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 support="$HOME/Library/Application Support/DockerShutdownReminder"
 agent="$HOME/Library/LaunchAgents/local.docker-shutdown-reminder.plist"
 if [ "$build_only" = true ]; then

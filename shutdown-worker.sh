@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-resource_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+resource_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 if /bin/sh "$resource_dir/stop-docker.sh"; then
     echo 'Docker Desktop stopped successfully.'
 else

@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+repo_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 test_dir=$(/usr/bin/mktemp -d)
 trap '/bin/rm -rf "$test_dir"' EXIT HUP INT TERM
 
