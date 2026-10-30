@@ -2,7 +2,13 @@
 on run
 	set windowKey to my reminderWindow((current date))
 	if windowKey is "" then return
-	if application id "com.docker.docker" is not running then return
+	-- Resolve Docker at runtime so compilation does not require it installed.
+	set dockerBundleID to "com.docker.docker"
+	try
+		if application id dockerBundleID is not running then return
+	on error
+		return
+	end try
 	set supportFolder to (POSIX path of (path to application support from user domain)) & "DockerShutdownReminder/"
 	set stateFile to supportFolder & "last-window"
 	try
