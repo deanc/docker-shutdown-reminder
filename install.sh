@@ -5,7 +5,25 @@ if [ "$(/usr/bin/uname -s)" != Darwin ]; then
     echo 'This reminder requires macOS.' >&2
     exit 1
 fi
-if [ ! -x /Applications/Docker.app/Contents/Resources/bin/docker ]; then
+build_only=false
+case $# in
+    0) ;;
+    2)
+        if [ "$1" != --build-only ] || [ -z "$2" ]; then
+            echo 'Usage: sh install.sh [--build-only OUTPUT_DIRECTORY]' >&2
+            exit 2
+        fi
+        build_only=true
+        /bin/mkdir -p "$2"
+        output_dir=$(CDPATH= cd -- "$2" && pwd)
+        ;;
+    *)
+        echo 'Usage: sh install.sh [--build-only OUTPUT_DIRECTORY]' >&2
+        exit 2
+        ;;
+esac
+
+if [ "$build_only" = false ] && [ ! -x /Applications/Docker.app/Contents/Resources/bin/docker ]; then
     echo 'Install Docker Desktop in /Applications/Docker.app first.' >&2
     exit 1
 fi
@@ -13,10 +31,13 @@ fi
 source_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 support="$HOME/Library/Application Support/DockerShutdownReminder"
 agent="$HOME/Library/LaunchAgents/local.docker-shutdown-reminder.plist"
+if [ "$build_only" = true ]; then
+    support="$output_dir/Application Support/DockerShutdownReminder"
+    agent="$output_dir/LaunchAgents/local.docker-shutdown-reminder.plist"
+fi
 app="$support/Docker Shutdown Reminder.app"
-domain="gui/$(/usr/bin/id -u)"
 
-/bin/mkdir -p "$support" "$HOME/Library/LaunchAgents"
+/bin/mkdir -p "$support" "$(dirname -- "$agent")"
 /usr/bin/osacompile -o "$app" "$source_dir/Reminder.applescript"
 /bin/cp "$source_dir/stop-docker.sh" "$app/Contents/Resources/stop-docker.sh"
 /bin/cp "$source_dir/shutdown-worker.sh" "$app/Contents/Resources/shutdown-worker.sh"
@@ -29,7 +50,7 @@ cat > "$agent" <<'PLIST'
 <plist version="1.0"><dict>
   <key>Label</key><string>local.docker-shutdown-reminder</string>
   <key>ProgramArguments</key><array>
-    <string>/usr/bin/open</string><string>-W</string><string>APP_PATH</string>
+    <string>/usr/bin/open</string><string>-W</string>
   </array>
   <key>LimitLoadToSessionType</key><string>Aqua</string>
   <key>StartCalendarInterval</key><array>
@@ -45,10 +66,16 @@ cat > "$agent" <<'PLIST'
 PLIST
 
 # Let plutil encode paths correctly, including spaces and XML characters.
-/usr/bin/plutil -replace ProgramArguments.2 -string "$app" "$agent"
+/usr/bin/plutil -insert ProgramArguments.2 -string "$app" "$agent"
 /usr/bin/plutil -replace StandardOutPath -string "$support/launchd.log" "$agent"
 /usr/bin/plutil -replace StandardErrorPath -string "$support/launchd-error.log" "$agent"
 /usr/bin/plutil -lint "$agent"
+if [ "$build_only" = true ]; then
+    echo "Built app and LaunchAgent in $output_dir. No schedule registered."
+    exit 0
+fi
+
+domain="gui/$(/usr/bin/id -u)"
 /bin/launchctl bootout "$domain/local.docker-shutdown-reminder" 2>/dev/null || true
 /bin/launchctl bootstrap "$domain" "$agent"
 /bin/launchctl enable "$domain/local.docker-shutdown-reminder"

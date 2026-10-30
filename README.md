@@ -1,5 +1,7 @@
 # Docker Shutdown Reminder
 
+[![CI](https://github.com/deanc/docker-shutdown-reminder/actions/workflows/ci.yml/badge.svg)](https://github.com/deanc/docker-shutdown-reminder/actions/workflows/ci.yml)
+
 A macOS AppleScript reminder to quit Docker Desktop at the end of the workday.
 
 At **17:30 Monday–Friday**, a Yes/No dialog asks whether you have finished with Docker. **Yes** asks Docker Desktop to shut down using its own quit operation. **No**, or Escape, leaves it running. No is the default.
@@ -90,9 +92,18 @@ On macOS:
 
 ```sh
 sh tests/run.sh
+sh tests/check-build.sh
 ```
 
-Checks shell syntax, compiles the AppleScript and verifies 20 scheduling cases, including weekday morning cutoffs, the weekend window and daylight-saving time. These checks do not display the reminder or run Docker commands. Docker Desktop shutdown was also tested manually.
+Checks shell syntax, compiles the AppleScript and verifies 20 scheduling cases, including weekday morning cutoffs, the weekend window and daylight-saving time. The build check verifies the app signature, bundled helpers, XML path escaping and weekday LaunchAgent configuration in a temporary directory. These checks do not display the reminder, register a schedule or run Docker commands. Docker Desktop shutdown was also tested manually.
+
+GitHub Actions runs these checks on macOS and ShellCheck on Linux for pushes and pull requests. Both jobs use standard GitHub-hosted runners, which are [free for public repositories](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+
+To build installation files without registering the schedule or requiring Docker:
+
+```sh
+sh install.sh --build-only /tmp/docker-reminder-build
+```
 
 ## References
 
