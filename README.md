@@ -1,6 +1,7 @@
 # Docker Shutdown Reminder
 
 [![CI](https://github.com/deanc/docker-shutdown-reminder/actions/workflows/ci.yml/badge.svg)](https://github.com/deanc/docker-shutdown-reminder/actions/workflows/ci.yml)
+[![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey?logo=apple)](#requirements)
 
 A macOS AppleScript reminder to quit Docker Desktop at the end of the workday.
 
